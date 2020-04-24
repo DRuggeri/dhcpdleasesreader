@@ -82,7 +82,7 @@ func (info *DhcpdInfo) Read() error {
 	var client string
 	now := time.Now()
 	info.Valid = 0
-	info.expired = 0
+	info.Expired = 0
 	info.Leases = make(map[string]*DhcpdLease)
 	scanner := bufio.NewScanner(file)
 
