@@ -13,9 +13,9 @@ type DhcpdInfo struct {
 	file    string
 	debug   bool
 	modTime time.Time
-	leases  map[string]*DhcpdLease
-	expired int
-	valid   int
+	Leases  map[string]*DhcpdLease
+	Expired int
+	Valid   int
 }
 
 type DhcpdLease struct {
@@ -81,9 +81,9 @@ func (info *DhcpdInfo) Read() error {
 	var ptr *DhcpdLease
 	var client string
 	now := time.Now()
-	info.valid = 0
+	info.Valid = 0
 	info.expired = 0
-	info.leases = make(map[string]*DhcpdLease)
+	info.Leases = make(map[string]*DhcpdLease)
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
@@ -102,7 +102,7 @@ func (info *DhcpdInfo) Read() error {
 				log.Printf("dhcpd_info.go: detected lease begin for `%v`\n", client)
 			}
 			lease := DhcpdLease{}
-			info.leases[client] = &lease
+			info.Leases[client] = &lease
 			ptr = &lease
 
 		case "client-hostname":
@@ -135,9 +135,9 @@ func (info *DhcpdInfo) Read() error {
 				ptr.ends = t
 			}
 			if now.After(t) {
-				info.expired++
+				info.Expired++
 			} else {
-				info.valid++
+				info.Valid++
 			}
 
 		case "cltt":
