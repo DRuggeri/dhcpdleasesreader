@@ -12,7 +12,7 @@ import (
 type DhcpdInfo struct {
 	file    string
 	debug   bool
-	modTime time.Time
+	ModTime time.Time
 	Leases  map[string]*DhcpdLease
 	Expired int
 	Valid   int
@@ -60,16 +60,16 @@ func (info *DhcpdInfo) Read() error {
 	}
 
 	/* Short cut - don't read again if the file hasn't changed */
-	if !fileInfo.ModTime().After(info.modTime) {
+	if !fileInfo.ModTime().After(info.ModTime) {
 		if info.debug {
 			log.Printf("dhcpd_info.go: File has not changed since last read. Not reading again.\n")
 		}
 		return nil
 	}
 
-	info.modTime = fileInfo.ModTime()
+	info.ModTime = fileInfo.ModTime()
 	if info.debug {
-		log.Printf("dhcpd_info.go: File has changed since last read (`%v` > `%v`). Reading and parsing file.\n", fileInfo.ModTime(), info.modTime)
+		log.Printf("dhcpd_info.go: File has changed since last read (`%v` > `%v`). Reading and parsing file.\n", fileInfo.ModTime(), info.ModTime)
 	}
 
 	file, err := os.Open(info.file)
