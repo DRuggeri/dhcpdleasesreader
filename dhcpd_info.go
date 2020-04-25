@@ -105,6 +105,7 @@ func (info *DhcpdInfo) Read() error {
 			info.Leases[client] = &lease
 			ptr = &lease
 
+
 		case "client-hostname":
 			name := strings.Join(parts[1:], " ")
 			name = strings.Trim(name, "\" ")
@@ -112,6 +113,7 @@ func (info *DhcpdInfo) Read() error {
 				log.Printf("dhcpd_info.go:   Parsed hostname: `%v`\n", name)
 			}
 			ptr.hostname = name
+
 
 		case "starts":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
@@ -124,6 +126,7 @@ func (info *DhcpdInfo) Read() error {
 				ptr.starts = t
 			}
 
+
 		case "ends":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
 			if err != nil {
@@ -134,11 +137,7 @@ func (info *DhcpdInfo) Read() error {
 				}
 				ptr.ends = t
 			}
-			if now.After(t) {
-				info.Expired++
-			} else {
-				info.Valid++
-			}
+
 
 		case "cltt":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
@@ -235,6 +234,14 @@ func (info *DhcpdInfo) Read() error {
 
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("dhcpd_info.go: scanner read of `%v`: `%v`", info.file, err)
+	}
+
+	for _, lease := range info.Leases {
+		if now.After(lease.ends) {
+			info.Expired++
+		} else {
+			info.Valid++
+		}
 	}
 
 	return nil
