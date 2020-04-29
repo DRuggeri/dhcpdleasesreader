@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"sync"
 )
 
 type DhcpdInfo struct {
@@ -16,6 +17,7 @@ type DhcpdInfo struct {
 	Leases  map[string]*DhcpdLease
 	Expired int
 	Valid   int
+	mux     sync.Mutex
 }
 
 type DhcpdLease struct {
@@ -50,9 +52,7 @@ func NewDhcpdInfo(i_file string, i_debug bool) (*DhcpdInfo, error) {
 }
 
 func (info *DhcpdInfo) Read() error {
-	if info.debug {
-		log.Printf("dhcpd_info.go: Opening file %s\n", info.file)
-	}
+	info.mux.Lock()
 
 	fileInfo, err := os.Stat(info.file)
 	if nil != err {
@@ -67,6 +67,11 @@ func (info *DhcpdInfo) Read() error {
 		return nil
 	}
 
+	if info.debug {
+		log.Printf("dhcpd_info.go: Opening file %s\n", info.file)
+	}
+
+	/* Do this AFTER acquiring the mutex so anyone waiting on the mutex is immediately released */
 	info.ModTime = fileInfo.ModTime()
 	if info.debug {
 		log.Printf("dhcpd_info.go: File has changed since last read (`%v` > `%v`). Reading and parsing file.\n", fileInfo.ModTime(), info.ModTime)
@@ -81,9 +86,9 @@ func (info *DhcpdInfo) Read() error {
 	var ptr *DhcpdLease
 	var client string
 	now := time.Now()
-	info.Valid = 0
-	info.Expired = 0
-	info.Leases = make(map[string]*DhcpdLease)
+	Valid := 0
+	Expired := 0
+	Leases := make(map[string]*DhcpdLease)
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
@@ -102,7 +107,7 @@ func (info *DhcpdInfo) Read() error {
 				log.Printf("dhcpd_info.go: detected lease begin for `%v`\n", client)
 			}
 			lease := DhcpdLease{}
-			info.Leases[client] = &lease
+			Leases[client] = &lease
 			ptr = &lease
 
 
@@ -236,13 +241,19 @@ func (info *DhcpdInfo) Read() error {
 		return fmt.Errorf("dhcpd_info.go: scanner read of `%v`: `%v`", info.file, err)
 	}
 
-	for _, lease := range info.Leases {
+	for _, lease := range Leases {
 		if now.After(lease.ends) {
-			info.Expired++
+			Expired++
 		} else {
-			info.Valid++
+			Valid++
 		}
 	}
 
+
+	/* Wait until the last second to replace data in the struct */
+	info.Leases = Leases
+	info.Valid = Valid
+	info.Expired = Expired
+	info.mux.Unlock()
 	return nil
 }
