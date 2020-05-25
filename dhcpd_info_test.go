@@ -1,10 +1,10 @@
 package dhcpdleasesreader
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
-	"log"
 )
 
 func TestRead(t *testing.T) {
@@ -31,7 +31,9 @@ func TestMux(t *testing.T) {
 
 	fxn := func(t *testing.T, info *DhcpdInfo, bg bool) {
 		where := "foreground"
-		if bg { where = "background" }
+		if bg {
+			where = "background"
+		}
 		for i := 0; i < 10; i++ {
 			time.Sleep(100 * time.Millisecond)
 			log.Printf("Attempting %s read...\n", where)

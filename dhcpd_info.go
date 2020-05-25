@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 	"sync"
+	"time"
 )
 
 var (
@@ -114,7 +114,6 @@ func (info *DhcpdInfo) Read() error {
 			Leases[client] = &lease
 			ptr = &lease
 
-
 		case "client-hostname":
 			name := strings.Join(parts[1:], " ")
 			name = strings.Trim(name, "\" ")
@@ -122,7 +121,6 @@ func (info *DhcpdInfo) Read() error {
 				log.Printf("dhcpd_info.go:   Parsed hostname: `%v`\n", name)
 			}
 			ptr.Hostname = name
-
 
 		case "starts":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
@@ -135,7 +133,6 @@ func (info *DhcpdInfo) Read() error {
 				ptr.Starts = t
 			}
 
-
 		case "ends":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
 			if err != nil {
@@ -146,7 +143,6 @@ func (info *DhcpdInfo) Read() error {
 				}
 				ptr.Ends = t
 			}
-
 
 		case "cltt":
 			t, err := time.Parse(`2006/01/02 15:04:05`, fmt.Sprintf("%s %s", parts[2], parts[3]))
@@ -252,7 +248,6 @@ func (info *DhcpdInfo) Read() error {
 			Valid++
 		}
 	}
-
 
 	/* Wait until the last second to replace data in the struct */
 	info.Leases = Leases
