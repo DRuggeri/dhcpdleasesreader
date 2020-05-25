@@ -10,6 +10,10 @@ import (
 	"sync"
 )
 
+var (
+	mux sync.Mutex
+)
+
 type DhcpdInfo struct {
 	file    string
 	debug   bool
@@ -17,7 +21,6 @@ type DhcpdInfo struct {
 	Leases  map[string]*DhcpdLease
 	Expired int
 	Valid   int
-	mux     sync.Mutex
 }
 
 type DhcpdLease struct {
@@ -52,7 +55,8 @@ func NewDhcpdInfo(i_file string, i_debug bool) (*DhcpdInfo, error) {
 }
 
 func (info *DhcpdInfo) Read() error {
-	info.mux.Lock()
+	mux.Lock()
+	defer mux.Unlock()
 
 	fileInfo, err := os.Stat(info.file)
 	if nil != err {
@@ -254,6 +258,5 @@ func (info *DhcpdInfo) Read() error {
 	info.Leases = Leases
 	info.Valid = Valid
 	info.Expired = Expired
-	info.mux.Unlock()
 	return nil
 }
