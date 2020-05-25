@@ -21,20 +21,20 @@ type DhcpdInfo struct {
 }
 
 type DhcpdLease struct {
-	hostname         string
-	starts           time.Time
-	ends             time.Time
-	cltt             time.Time
-	uid              string
-	state            string
-	next             string
-	rewind           string
-	hardware_type    string
-	hardware_address string
-	ddns_fwd_name    string
-	ddns_rev_name    string
-	ddns_dhcid       string
-	identifier       string
+	Hostname         string
+	Starts           time.Time
+	Ends             time.Time
+	Cltt             time.Time
+	Uid              string
+	State            string
+	Next             string
+	Rewind           string
+	Hardware_type    string
+	Hardware_address string
+	Ddns_fwd_name    string
+	Ddns_rev_name    string
+	Ddns_dhcid       string
+	Identifier       string
 }
 
 func NewDhcpdInfo(i_file string, i_debug bool) (*DhcpdInfo, error) {
@@ -117,7 +117,7 @@ func (info *DhcpdInfo) Read() error {
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed hostname: `%v`\n", name)
 			}
-			ptr.hostname = name
+			ptr.Hostname = name
 
 
 		case "starts":
@@ -128,7 +128,7 @@ func (info *DhcpdInfo) Read() error {
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed start time: `%v`\n", t)
 				}
-				ptr.starts = t
+				ptr.Starts = t
 			}
 
 
@@ -140,7 +140,7 @@ func (info *DhcpdInfo) Read() error {
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed end time: `%v`\n", t)
 				}
-				ptr.ends = t
+				ptr.Ends = t
 			}
 
 
@@ -152,39 +152,39 @@ func (info *DhcpdInfo) Read() error {
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed cltt time: `%v`\n", t)
 				}
-				ptr.cltt = t
+				ptr.Cltt = t
 			}
 
 		case "binding":
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed state: `%v`\n", parts[2])
 			}
-			ptr.state = parts[2]
+			ptr.State = parts[2]
 
 		case "next":
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed next: `%v`\n", parts[2])
 			}
-			ptr.next = parts[2]
+			ptr.Next = parts[2]
 
 		case "rewind":
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed rewind: `%v`\n", parts[2])
 			}
-			ptr.rewind = parts[2]
+			ptr.Rewind = parts[2]
 
 		case "hardware":
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed hardware type/address: `%v`/`%v`\n", parts[1], parts[2])
 			}
-			ptr.hardware_type = parts[1]
-			ptr.hardware_address = parts[1]
+			ptr.Hardware_type = parts[1]
+			ptr.Hardware_address = parts[1]
 
 		case "uid":
 			if info.debug {
 				log.Printf("dhcpd_info.go:   Parsed uid: `%v`\n", parts[1])
 			}
-			ptr.uid = parts[1]
+			ptr.Uid = parts[1]
 
 		case "set":
 			parts2 := strings.Split(line, "=")
@@ -194,25 +194,25 @@ func (info *DhcpdInfo) Read() error {
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed ddns_fwd_name: `%v`\n", value)
 				}
-				ptr.ddns_fwd_name = value
+				ptr.Ddns_fwd_name = value
 
 			case "ddns-rev-name":
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed ddns_rev_name: `%v`\n", value)
 				}
-				ptr.ddns_rev_name = value
+				ptr.Ddns_rev_name = value
 
 			case "ddns-dhcid":
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed ddns_dhcid: `%v`\n", value)
 				}
-				ptr.ddns_dhcid = value
+				ptr.Ddns_dhcid = value
 
 			case "vendor-class-identifier":
 				if info.debug {
 					log.Printf("dhcpd_info.go:   Parsed identifier: `%v`\n", value)
 				}
-				ptr.identifier = value
+				ptr.Identifier = value
 
 			default:
 				if info.debug {
@@ -242,7 +242,7 @@ func (info *DhcpdInfo) Read() error {
 	}
 
 	for _, lease := range Leases {
-		if now.After(lease.ends) {
+		if now.After(lease.Ends) {
 			Expired++
 		} else {
 			Valid++
