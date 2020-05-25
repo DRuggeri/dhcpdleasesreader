@@ -182,7 +182,7 @@ func (info *DhcpdInfo) Read() error {
 				log.Printf("dhcpd_info.go:   Parsed hardware type/address: `%v`/`%v`\n", parts[1], parts[2])
 			}
 			ptr.Hardware_type = parts[1]
-			ptr.Hardware_address = parts[1]
+			ptr.Hardware_address = parts[2]
 
 		case "uid":
 			if info.debug {
